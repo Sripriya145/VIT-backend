@@ -110,6 +110,39 @@ import os
 from .processcsvfile import process_and_predict
 class CsvUploadView(APIView):
     def post(self, request, *args, **kwargs):
+        files = request.FILES.getlist('files')
+        if not files:
+            return Response({'error': 'No files provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+        uploaded_files_info = []
+        try:
+            for file in files:
+                fs = FileSystemStorage()
+                filename = fs.save(file.name, file)
+                file_path = fs.path(filename)
+                file_extension = os.path.splitext(file.name)[1]
+
+                if file_extension == '.csv':
+                    uploaded_files_info.append({
+                        'filename': file.name,
+                        'file_path': file_path,
+                        'file_type': file_extension
+                    })
+
+            # Process the uploaded CSV files and generate plot
+            result = process_and_predict(uploaded_files_info)
+            
+            return Response({
+                'message': 'Files uploaded and processed successfully',
+                'files': uploaded_files_info,
+                'result': result['prediction'],
+                'plot': result['plot']  # Base64-encoded image string
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def post(self, request, *args, **kwargs):
         files = request.FILES.getlist('files')  # Get a list of uploaded files
         if not files:
             return Response({'error': 'No files provided'}, status=status.HTTP_400_BAD_REQUEST)
