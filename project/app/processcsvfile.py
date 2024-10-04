@@ -117,7 +117,7 @@ def process_and_predict(filepath):
 
     # Define faulty areas - customize these thresholds based on domain knowledge
     faulty_fhr_indices = np.where((fhr < 110) | (fhr > 160))[0]  # Example: FHR abnormal if <110 or >160
-    faulty_uct_indices = np.where(uct > 90)[0]  # Example: UCT abnormal if >90
+    faulty_uct_indices = np.where(uct > 60)[0]  # Example: UCT abnormal if >90
 
     # Generate the enhanced plot
     image_base64 = generate_enhanced_plot(fhr, uct, faulty_fhr_indices, faulty_uct_indices)
