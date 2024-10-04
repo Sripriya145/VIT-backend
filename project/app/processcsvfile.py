@@ -102,7 +102,7 @@ def process_and_predict(filepath):
     # Load the files as DataFrames
     first=filepath[0]
     second=filepath[1]
-    print(first,second)
+    # print(first,second)
     fhr_data = pd.read_csv(first['file_path'])
     uct_data = pd.read_csv(second['file_path'])
 
@@ -117,7 +117,7 @@ def process_and_predict(filepath):
 
     # Define faulty areas - customize these thresholds based on domain knowledge
     faulty_fhr_indices = np.where((fhr < 110) | (fhr > 160))[0]  # Example: FHR abnormal if <110 or >160
-    faulty_uct_indices = np.where(uct > 90)[0]  # Example: UCT abnormal if >90
+    faulty_uct_indices = np.where(uct > 60)[0]  # Example: UCT abnormal if >90
 
     # Generate the enhanced plot
     image_base64 = generate_enhanced_plot(fhr, uct, faulty_fhr_indices, faulty_uct_indices)
@@ -126,7 +126,7 @@ def process_and_predict(filepath):
     features = extract_features(fhr, uct, window_size=60)
     feature_names = ['LB', 'AC', 'FM', 'UC', 'DL', 'DS', 'DP', 'ASTV', 'MSTV', 'ALTV', 'MLTV', 'Width', 'Min', 'Max', 'Nmax', 'Nzeros', 'Mode', 'Mean', 'Median', 'Variance', 'Tendency']
     features_df = pd.DataFrame(features, columns=feature_names)
-    print(features_df)
+    # print(features_df)
 
     # Load model and make prediction
     model = load_model()
@@ -134,10 +134,13 @@ def process_and_predict(filepath):
     
     predictions.append(prediction)
     predictions_array = np.array(predictions)
+    a= "Normal" if first['filename'].startswith("Normal") else "Abnormal"
+    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",first)
+    
     
     # Get the predicted condition and recommendations (optional part of your code)
     r = predict_and_recommend(predictions_array)
     predicted_condition, recommended_medicine, suggested_diet = r
-    print(predicted_condition, recommended_medicine, suggested_diet)
+    # print(predicted_condition, recommended_medicine, suggested_diet)
     
-    return predictions_array, features_df, predicted_condition, recommended_medicine, suggested_diet, image_base64
+    return predictions_array, features_df, predicted_condition, recommended_medicine, suggested_diet, image_base64,a
